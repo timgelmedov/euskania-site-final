@@ -7,7 +7,7 @@
   "use strict";
 
   // Public Web3Forms access key (designed to live in client code).
-  var ACCESS_KEY = "WEB3FORMS_ACCESS_KEY";
+  var ACCESS_KEY = "f215e0f9-314f-4ddc-b0d3-7927b48d934d";
   var ENDPOINT = "https://api.web3forms.com/submit";
 
   var TEXT = {
