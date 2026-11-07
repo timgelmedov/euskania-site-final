@@ -48,17 +48,31 @@ El ZIP que sale de Framer no se puede subir tal cual. Esto es lo que se le hace:
    *Proyectos y cálculos a medida* se elimina del array de slides en
    `js/framer/-6xHlvkpZ7-….mjs` (aparece una vez por breakpoint). Euskania no presta
    ese servicio. El texto de ese carrusel **no está en el HTML**, solo en ese módulo.
-6. **Fotografías propias.** Las dos imágenes de stock de robots generadas por IA se
-   sustituyen por fotos reales de la empresa:
-   `OG4xOmgWHupxm4osVRKhY17r82Q.jpg` → `/img/solarcleano-m1-limpieza-paneles.jpg`
-   `HPXEA5xCJni1R7k6yD5rPRZcCbg.png` → `/img/limpieza-robotizada-cubierta-industrial.jpg`
-   Se reemplaza la URL base y los `srcset` resuelven al mismo archivo.
+6. **Fotografías propias.** Las imágenes de stock generadas por IA se sustituyen por
+   fotos reales de la empresa. Hay que cambiarlas **en el HTML y en los módulos**
+   `js/framer/-6xHlvkpZ7-….mjs` y `js/framer/toplevel-deps.….mjs`: si solo se toca el
+   HTML, el runtime vuelve a pintar la de stock al hidratar.
+
+   | Imagen de stock | Sustituida por |
+   | --- | --- |
+   | `OG4xOmgWHupxm4osVRKhY17r82Q.jpg` robot amarillo | `/img/solarcleano-m1-limpieza-paneles.jpg` |
+   | `HPXEA5xCJni1R7k6yD5rPRZcCbg.png` robot negro | `/img/limpieza-robotizada-cubierta-industrial.jpg` |
+   | `ZDQTSgPGNxZiYNu6Exvda7fd24s.jpg` robot naranja | `/img/modulos-sucios-limpieza.jpg` |
+   | `rZHBE7NR7EEGGrfthPwZc2vDBQ.jpg` operario al atardecer | `/img/montaje-paneles-cubierta-industrial.jpg` |
+   | `ZwcTpmaV5uQODbhEfQbJAptkM.jpg` manos con tableta | `/img/inversor-y-baterias.jpg` |
+   | `7W0wTflDjUGfLwi6jIKQ35R450.png` marquesina | `/img/marquesina-fotovoltaica.jpg` |
+
+   Se reemplaza la URL base, de modo que todas las variantes del `srcset` apuntan al
+   mismo archivo. Conviene revisar también el texto alternativo, que describía la foto
+   antigua.
+
 7. **robots.txt y sitemap.xml**, que el export no incluye.
 
 ## Pendiente
 
-- El resto de imágenes (unas 26) y las fuentes siguen sirviéndose desde
+- El resto de imágenes (unas 20) y las fuentes siguen sirviéndose desde
   `framerusercontent.com`. El sitio depende de ese CDN para la parte visual.
-- Varias fotos de la sección «Instalaciones recientes» siguen siendo de stock, con
-  textos de proyectos que no corresponden a obras reales.
+- En «Instalaciones recientes» quedan de stock las tarjetas Villa privada, Caserío y
+  Hotel en la costa, con descripciones de obras que no corresponden a proyectos reales.
+- Las seis ilustraciones de la sección «Soluciones» siguen siendo de stock.
 - Los iconos de la página de contacto se cargan desde `framer.com/m/phosphor-icons/`.
