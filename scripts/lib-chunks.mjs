@@ -55,7 +55,9 @@ export function isTranslatable(s) {
   if (DO_NOT_TRANSLATE.has(s)) return false;
   if (s.length < 2 || s.length > 400) return false;
   if (/[{}<>;=|\\]/.test(s)) return false;                 // code fragments
-  if (/https?:|rgba?\(|var\(|\d+px\b|^--|^#|@/.test(s)) return false;
+  // "@" is allowed through: the email field's placeholder is example text and
+  // needs translating. Real addresses are caught by DO_NOT_TRANSLATE.
+  if (/https?:|rgba?\(|var\(|\d+px\b|^--|^#/.test(s)) return false;
   if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(s)) return false;       // needs a letter
   if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(s)) return false;      // pan-y, no-autoplay
   if (/^[A-Za-z0-9_$]+$/.test(s) && !/^[A-ZÁÉÍÓÚÑ]/.test(s)) return false;

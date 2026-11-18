@@ -399,6 +399,7 @@ export const TRANSLATIONS = [
   ["Inicio", "Hasiera"],
   ["Enviar", "Bidali"],
   ["Nombre", "Izena"],
+  ["nombre@ejemplo.com", "izena@adibidea.eus"],
 
   // Street name is already Basque; only the Spanish parts change.
   ["C/ Independentzia, 2, bajo · 48940 Leioa, Bizkaia",
