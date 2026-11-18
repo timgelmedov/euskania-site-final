@@ -10,13 +10,29 @@
   var ACCESS_KEY = "f215e0f9-314f-4ddc-b0d3-7927b48d934d";
   var ENDPOINT = "https://api.web3forms.com/submit";
 
-  var TEXT = {
-    sending: "Enviando…",
-    success: "¡Gracias! Hemos recibido tu mensaje. Te respondemos en menos de 24 horas.",
-    error: "No se ha podido enviar el formulario. Escríbenos a euskania.es@gmail.com o por WhatsApp al +34 624 161 228.",
-    invalidEmail: "Revisa el correo electrónico.",
-    missing: "Rellena tu nombre y un teléfono o correo para poder contactarte.",
+  // The Basque pages live under /eu/, so the visitor-facing strings follow
+  // the path. The notification that reaches the inbox stays in Spanish.
+  var LANG = /^\/eu(\/|$)/.test(location.pathname) ? "eu" : "es";
+
+  var COPY = {
+    es: {
+      sending: "Enviando…",
+      success: "¡Gracias! Hemos recibido tu mensaje. Te respondemos en menos de 24 horas.",
+      error: "No se ha podido enviar el formulario. Escríbenos a euskania.es@gmail.com o por WhatsApp al +34 624 161 228.",
+      invalidEmail: "Revisa el correo electrónico.",
+      missing: "Rellena tu nombre y un teléfono o correo para poder contactarte.",
+    },
+    eu: {
+      sending: "Bidaltzen…",
+      success: "Eskerrik asko! Zure mezua jaso dugu. 24 ordu baino lehen erantzungo dizugu.",
+      error: "Ezin izan da formularioa bidali. Idatzi euskania.es@gmail.com helbidera edo WhatsApp bidez +34 624 161 228 zenbakira.",
+      invalidEmail: "Begiratu helbide elektronikoa.",
+      missing: "Bete zure izena eta telefono bat edo helbide elektroniko bat, zurekin harremanetan jartzeko.",
+    },
   };
+
+  var TEXT = COPY[LANG];
+
 
   // Hidden decoy fields Framer adds to catch bots.
   var HONEYPOTS = ["website", "company", "message", "subject", "title", "description", "feedback", "notes", "details", "remarks", "comments"];
@@ -122,6 +138,7 @@
       "Tipo de propiedad": lead.propertyType || "—",
       Mensaje: lead.message || "—",
       "Página": location.href,
+      Idioma: LANG === "eu" ? "Euskara" : "Español",
     };
     if (lead.email) payload.replyto = lead.email;
 

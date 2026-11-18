@@ -68,6 +68,58 @@ El ZIP que sale de Framer no se puede subir tal cual. Esto es lo que se le hace:
 
 7. **robots.txt y sitemap.xml**, que el export no incluye.
 
+
+## Euskarazko bertsioa (/eu/)
+
+La versión en euskera se **genera**, no se edita a mano. Todo lo que hay en
+`eu/` y en `js/framer-eu/` sale de un script.
+
+```bash
+node scripts/extract-strings.mjs     # busca cadenas traducibles -> i18n/eu.json
+node scripts/apply-translations.mjs  # vuelca scripts/translations-eu.mjs en la tabla
+node scripts/build-eu.mjs            # genera eu/ y js/framer-eu/
+```
+
+Tras un export nuevo de Framer hay que ejecutar los tres, en ese orden.
+
+**Por qué hace falta todo esto.** El runtime de Framer vuelve a pintar la
+página desde los módulos, así que traducir solo el HTML no sirve: se revierte
+al hidratar. Y al revés, los títulos que Framer parte en un `<span>` por
+palabra se quedan con el marcado del servidor y no se repintan. Por eso el
+script traduce **las dos capas**: los módulos y el HTML, incluidos esos
+títulos partidos (`replaceSplitText`).
+
+Qué más hace `build-eu.mjs`:
+
+- quita la sección «Instalaciones recientes», que en euskera no se publica
+- apunta el HTML a `js/framer-eu/` en vez de `js/framer/`
+- deja el router dentro de `/eu` y marca el locale como `eu`
+- traduce title y description, tanto en el `<head>` como en los módulos de
+  metadatos que el router usa al navegar
+- inyecta `hreflang` y el selector de idioma en las dos versiones
+- regenera `sitemap.xml`
+
+Es idempotente: se puede ejecutar las veces que haga falta.
+
+### Traducción
+
+`scripts/translations-eu.mjs` es la fuente. Un hablante puede revisarlo sin
+tocar nada más. Euskara Batua, registro zuka, el estándar de uso comercial en
+Bilbao.
+
+Las entradas sin traducir no rompen nada: el build las salta y deja el
+castellano. `SKIP` lista lo que se deja a propósito (nombres de propiedades
+de Framer, unidades, marcas).
+
+**`REVIEW` en ese mismo archivo recoge 10 términos que debería confirmar un
+hablante nativo** (autoconsumo, cubierta, marquesina, legalización…). No son
+palabras inventadas sino elecciones entre variantes aceptadas, pero nadie del
+equipo las ha validado todavía.
+
+Los textos legales (privacidad, cookies, aviso legal) **no se traducen
+automáticamente**. Hoy son enlaces vacíos; cuando existan, los redacta una
+persona.
+
 ## Pendiente
 
 - El resto de imágenes (unas 20) y las fuentes siguen sirviéndose desde
@@ -76,3 +128,6 @@ El ZIP que sale de Framer no se puede subir tal cual. Esto es lo que se le hace:
   Hotel en la costa, con descripciones de obras que no corresponden a proyectos reales.
 - Las seis ilustraciones de la sección «Soluciones» siguen siendo de stock.
 - Los iconos de la página de contacto se cargan desde `framer.com/m/phosphor-icons/`.
+- En euskera faltan por revisar los 10 términos de `REVIEW`, y la sección
+  «Instalaciones recientes» sigue publicada en castellano con descripciones de
+  obras que no corresponden a proyectos reales.
