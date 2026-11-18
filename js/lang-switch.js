@@ -10,14 +10,16 @@
 
   var MARK = "data-euskania-lang";
   var HEADER = '[data-framer-name="Header Container"]';
-  // Wide layouts put a CTA at the end of the header row: the control goes
-  // immediately before it. Narrow layouts drop the CTA for a hamburger, and
-  // the header becomes a COLUMN, so appending to it would push the control
-  // onto a second row; there it goes into the logo row, before the hamburger.
-  // Either way it sits to the left of the button.
+  // Wide layouts put a CTA at the end of the header row: the control sits just
+  // to the left of it, shifted 40px towards the button so the pair reads as one
+  // group. Narrow layouts have a hamburger instead, and there the control
+  // belongs inside the open menu — between the links and the CTA — so the top
+  // bar keeps only the logo and the burger. While the menu is closed there is
+  // nowhere sensible to show it, so it is removed.
   var CTA = '[data-framer-name="Call To Action Button"]';
-  var ROW = '[data-framer-name="Logo And Hamburger"]';
+  var LINKS = '[data-framer-name="Navigation Links"]';
   var BURGER = '[data-framer-name="Hamburger Menu Icon"]';
+  var DESKTOP_SHIFT = 40;
 
   function current() {
     return /^\/eu(\/|$)/.test(location.pathname) ? "eu" : "es";
@@ -33,7 +35,7 @@
     return p.replace(/^\/eu/, "") || "/";
   }
 
-  function build() {
+  function build(phone) {
     var here = current();
     var box = document.createElement("div");
     box.setAttribute(MARK, "");
@@ -41,8 +43,14 @@
       "display:inline-flex", "align-items:center", "gap:2px",
       "padding:2px", "border-radius:30px",
       "background:rgba(17,17,17,.06)",
-      "font-family:Geist, system-ui, sans-serif", "font-size:11px",
+      "font-family:Geist, system-ui, sans-serif",
+      "font-size:" + (phone ? "13px" : "11px"),
       "line-height:1", "flex:0 0 auto",
+      // In the menu the control is a row of its own. In the header row it is
+      // nudged towards the button it belongs with: the row is space-between,
+      // so a margin would be swallowed by the free space and a transform is
+      // the only way to move it the full distance.
+      phone ? "margin:4px 0" : "transform:translateX(" + DESKTOP_SHIFT + "px)",
     ].join(";");
 
     [["es", "ES"], ["eu", "EU"]].forEach(function (pair) {
@@ -57,7 +65,8 @@
       el.setAttribute("aria-label", code === "eu" ? "Euskaraz" : "En español");
       if (on) el.setAttribute("aria-current", "true");
       el.style.cssText = [
-        "padding:5px 9px", "border-radius:30px", "text-decoration:none",
+        "padding:" + (phone ? "9px 14px" : "5px 9px"),
+        "border-radius:30px", "text-decoration:none",
         "font-weight:" + (on ? "600" : "500"),
         "color:" + (on ? "#111" : "rgba(17,17,17,.55)"),
         "background:" + (on ? "#92FF8C" : "transparent"),
@@ -68,25 +77,50 @@
     return box;
   }
 
+  /**
+   * Where the control belongs in this header, or null if it belongs nowhere.
+   * `after` and `before` name a stable sibling, never the control itself, so
+   * the "already in place" test below cannot chase its own insertion.
+   */
+  function slot(header) {
+    // A hamburger means the narrow layout, open or closed.
+    if (header.querySelector(BURGER)) {
+      var links = header.querySelector(LINKS);
+      // Links are only in the DOM while the menu is open.
+      if (!links || !links.parentElement) return null;
+      return { parent: links.parentElement, after: links, phone: true };
+    }
+    var cta = header.querySelector(CTA);
+    if (cta && cta.parentElement) {
+      return { parent: cta.parentElement, before: cta, phone: false };
+    }
+    return { parent: header, before: null, phone: false };
+  }
+
+  function inPlace(el, at) {
+    if (el.parentElement !== at.parent) return false;
+    if (at.after) return el.previousElementSibling === at.after;
+    return el.nextElementSibling === (at.before || null);
+  }
+
   function mount() {
     var headers = document.querySelectorAll(HEADER);
     if (!headers.length) return false;
 
     var added = false;
     Array.prototype.forEach.call(headers, function (header) {
-      if (header.querySelector("[" + MARK + "]")) return;
+      var existing = header.querySelector("[" + MARK + "]");
+      var at = slot(header);
 
-      var cta = header.querySelector(CTA);
-      if (cta && cta.parentElement) {
-        cta.parentElement.insertBefore(build(), cta);
-        added = true;
+      if (!at) {
+        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
         return;
       }
-
-      var row = header.querySelector(ROW) || header;
-      var burger = row.querySelector(BURGER);
-      if (burger) row.insertBefore(build(), burger);
-      else row.appendChild(build());
+      if (existing) {
+        if (inPlace(existing, at)) return;
+        existing.parentNode.removeChild(existing);
+      }
+      at.parent.insertBefore(build(at.phone), at.after ? at.after.nextSibling : at.before);
       added = true;
     });
     return added;
