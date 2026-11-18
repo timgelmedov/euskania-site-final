@@ -371,6 +371,9 @@ export const TRANSLATIONS = [
    "   Orria ez da aurkitu"],
 
   // Navigation, section labels and form fields.
+  // The header CTA only renders at the widest breakpoint, which is why it was
+  // missed on the first pass.
+  ["Pedir presupuesto", "Eskatu aurrekontua"],
   ["Viviendas unifamiliares", "Familia bakarreko etxebizitzak"],
   ["Solicita asesoramiento", "Eskatu aholkularitza"],
   ["Asesoramiento gratuito", "Doako aholkularitza"],

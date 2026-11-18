@@ -10,6 +10,14 @@
 
   var MARK = "data-euskania-lang";
   var HEADER = '[data-framer-name="Header Container"]';
+  // Wide layouts put a CTA at the end of the header row: the control goes
+  // immediately before it. Narrow layouts drop the CTA for a hamburger, and
+  // the header becomes a COLUMN, so appending to it would push the control
+  // onto a second row; there it goes into the logo row, before the hamburger.
+  // Either way it sits to the left of the button.
+  var CTA = '[data-framer-name="Call To Action Button"]';
+  var ROW = '[data-framer-name="Logo And Hamburger"]';
+  var BURGER = '[data-framer-name="Hamburger Menu Icon"]';
 
   function current() {
     return /^\/eu(\/|$)/.test(location.pathname) ? "eu" : "es";
@@ -31,7 +39,7 @@
     box.setAttribute(MARK, "");
     box.style.cssText = [
       "display:inline-flex", "align-items:center", "gap:2px",
-      "margin-left:8px", "padding:2px", "border-radius:30px",
+      "padding:2px", "border-radius:30px",
       "background:rgba(17,17,17,.06)",
       "font-family:Geist, system-ui, sans-serif", "font-size:11px",
       "line-height:1", "flex:0 0 auto",
@@ -63,10 +71,22 @@
   function mount() {
     var headers = document.querySelectorAll(HEADER);
     if (!headers.length) return false;
+
     var added = false;
-    Array.prototype.forEach.call(headers, function (h) {
-      if (h.querySelector("[" + MARK + "]")) return;
-      h.appendChild(build());
+    Array.prototype.forEach.call(headers, function (header) {
+      if (header.querySelector("[" + MARK + "]")) return;
+
+      var cta = header.querySelector(CTA);
+      if (cta && cta.parentElement) {
+        cta.parentElement.insertBefore(build(), cta);
+        added = true;
+        return;
+      }
+
+      var row = header.querySelector(ROW) || header;
+      var burger = row.querySelector(BURGER);
+      if (burger) row.insertBefore(build(), burger);
+      else row.appendChild(build());
       added = true;
     });
     return added;
